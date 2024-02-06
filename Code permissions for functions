@@ -1,1 +1,64 @@
-c
+open Microsoft.Quantum.Diagnostics;
+open Microsoft.Quantum.ErrorCorrection;
+open Microsoft.Quantum.Convert;
+open Microsoft.Quantum.Noise;
+open Microsoft.Quantum.Measurement;
+
+// Define a noise model for a near-zero temperature environment
+operation NearZeroTemperatureNoise(qubits: Qubit[], noiseModel: NoiseModel) : Unit {
+    using(qubits) {
+        PermissionSetName("ApplyNoiseModelPermission") {
+            ApplyNoiseModel(noiseModel, qubits);
+        }
+    }
+}
+
+// Operation to encode qubits using the Steane code
+operation EncodeQubitsWithSteane(qubits: Qubit[]) : Unit {
+    using(qubits) {
+        PermissionSetName("EncodeQubitsPermission") {
+            let code = SteaneCode();
+            let encodedQubits = code.EncodeQubits(qubits);
+            ResetAll(qubits);
+            ResetAll(encodedQubits);
+        }
+    }
+}
+
+// Operation to perform error correction using the Steane code
+operation ErrorCorrectionWithSteane(qubits: Qubit[]) : Unit {
+    using(qubits) {
+        PermissionSetName("ErrorCorrectionPermission") {
+            let code = SteaneCode();
+            code.DecodeQubits(qubits);
+        }
+    }
+}
+
+// Operation for Reverse Computation, Entanglement, Error Correction, and Noise Simulation
+operation ReverseComputationWithErrorCorrection() : String {
+    use qubits = Qubit[2];
+    let noiseModel = GetNoiseModel("thermal");
+
+    EncodeQubitsWithSteane(qubits);
+    ReverseComputationAndEntanglement(qubits[0], qubits[1]);
+    ErrorCorrectionWithSteane(qubits);
+    NearZeroTemperatureNoise(qubits, noiseModel);
+
+    let result1 = M(qubits[0]);
+    let result2 = M(qubits[1]);
+
+    // Print measurement results
+    let message = $"Measurement Result Qubit 1: {result1}\n";
+    message += $"Measurement Result Qubit 2: {result2}";
+    
+    ResetAll(qubits);
+
+    return message;
+}
+
+operation RunReverseComputationWithErrorCorrection() : String {
+    PermissionSetName("RunPermission") {
+        return ReverseComputationWithErrorCorrection();
+    }
+}
