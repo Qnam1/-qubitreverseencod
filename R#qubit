@@ -1,0 +1,15 @@
+EncodeQubitsWithSteane(qubits);
+ReverseComputationAndEntanglement(qubits[0], qubits[1]);
+ErrorCorrectionWithSteane(qubits);
+NearZeroTemperatureNoise(qubits, noiseModel);
+
+let result1 = M(qubits[0]);
+let result2 = M(qubits[1]);
+
+// Print measurement results
+let message = $"Measurement Result Qubit 1: {result1}\n";
+message += $"Measurement Result Qubit 2: {result2}";
+
+ResetAll(qubits);
+
+return message;
