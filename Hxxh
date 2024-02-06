@@ -1,0 +1,30 @@
+operation HXXH(qubits: Qubit[]) : Unit {
+    let control = qubits[0];
+    let target = qubits[1];
+
+    // Apply RCNOT with reversed control qubit (Hadamard gate) on target
+    Controlled X([control], (H, [target]));
+    Swap(control, target);
+    Controlled X([control], (H, [target]));
+}
+
+operation TestHXXH() : String {
+    // Create test qubits
+    use qubits = Qubit[2];
+    H(qubits[0]);
+
+    // Apply the transformation
+    HXXH(qubits);
+
+    // Measure the qubits and return the results
+    let result1 = M(qubits[0]);
+    let result2 = M(qubits[1]);
+
+    // Print measurement results
+    let message = $"Measurement Result Qubit 1: {result1}\n";
+    message += $"Measurement Result Qubit 2: {result2}";
+    
+    ResetAll(qubits);
+
+    return message;
+}
